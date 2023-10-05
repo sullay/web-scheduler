@@ -1,8 +1,9 @@
 {
   "name": "web-scheduler",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "",
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "tsc --build --clean",
@@ -29,5 +30,12 @@
     "jest": "^29.7.0",
     "ts-jest": "^29.1.1",
     "typescript": "^5.2.2"
-  }
+  },
+  "files": [
+    "index.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.d.ts",
+    "utils/**/*.js",
+    "utils/**/*.d.ts"
+  ]
 }
