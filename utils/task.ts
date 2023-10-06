@@ -21,7 +21,7 @@ export const DEFAULT_PRIORITY_TIMEOUT = {
     [PRIORITY_TYPE.IDLE]: 1073741823 as const
 }
 
-export type TaskKeyType = number | string | symbol
+export type TaskKeyType = number | string | symbol | object
 
 export type NodePre = Array<undefined | null | Node>
 

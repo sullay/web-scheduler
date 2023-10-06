@@ -155,7 +155,10 @@ export class TaskList {
                 let nextNode = node.getNext(level - 1)
                 // 计算当前任务的层级与最高层级的下一个任务
                 while (!Node.isNode(nextNode)) {
-                    if (level < 1) throw new Error(`任务【${key.toString()}】,不在跳表中`)
+                    if (level < 1) {
+                        console.error('更新任务异常', key)
+                        throw new Error('任务不在跳表中')
+                    }
                     level--
                     nextNode = node.getNext(level - 1)
                 }
@@ -163,20 +166,32 @@ export class TaskList {
                 for (let i = level - 1; i >= 0; i--) {
                     const pre = node.getPre(i)
                     const next = node.getNext(i)
-                    if (!Node.isNode(pre) || !Node.isNode(next)) throw Error(`任务【${key.toString()}】，第${i}层级,不存在nextNode或者preNode`)
+                    if (!Node.isNode(pre) || !Node.isNode(next)) {
+                        console.error('更新任务异常', key)
+                        throw Error(`第${i}层级,不存在nextNode或者preNode`)
+                    }
                     pre.setNext(i, next)
                     next.setPre(i, pre)
                 }
                 // 各层级插入新的位置
                 for (let i = level - 1; i >= 0; i--) {
                     let preNode = nextNode.getPre(i)
-                    if (!Node.isNode(preNode)) throw Error(`任务:${key.toString()}，第${i}层级,不存在preNode`)
+                    if (!Node.isNode(preNode)) {
+                        console.error('更新任务异常', key)
+                        throw Error(`第${i}层级,不存在preNode`)
+                    }
 
                     while (preNode !== this.head && preNode.getTask().getTimeout() > task.getTimeout()) {
                         nextNode = nextNode.getPre(i)
-                        if (!Node.isNode(nextNode)) throw Error(`任务【${key.toString()}】，第${i}层级,不存在nextNode`)
+                        if (!Node.isNode(nextNode)) {
+                            console.error('更新任务异常', key)
+                            throw Error(`第${i}层级,不存在nextNode`)
+                        }
                         preNode = preNode.getPre(i)
-                        if (!Node.isNode(preNode)) throw Error(`任务【${key.toString()}】，第${i}层级,不存在preNode`)
+                        if (!Node.isNode(preNode)) {
+                            console.error('更新任务异常', key)
+                            throw Error(`第${i}层级,不存在preNode`)
+                        }
                     }
 
                     node.setNext(i, nextNode)
@@ -198,7 +213,10 @@ export class TaskList {
             let preNode = this.head
             for (let i = level - 1; i >= 0; i--) {
                 let nextNode = preNode.getNext(i)
-                if (!Node.isNode(nextNode)) throw new Error(`任务【${preNode.getTask().getKey().toString()}】,不存在nextNode`)
+                if (!Node.isNode(nextNode)) {
+                    console.error('新增任务异常', preNode.getTask().getKey())
+                    throw new Error('不存在nextNode')
+                }
 
                 while (nextNode !== this.tail && nextNode.getTask().getTimeout() <= task.getTimeout()) {
                     const _preNode = preNode.getNext(i)
