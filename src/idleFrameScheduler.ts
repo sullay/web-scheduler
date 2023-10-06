@@ -22,12 +22,12 @@ class IdleFrameScheduler {
      * 执行任务循环
      * @param timeRemaining 用于计算空闲时间的函数
      */
-    private workLoop ({ timeRemaining }: IdleDeadline) {
+    private workLoop (idleDeadline: IdleDeadline) {
         while (true) {
             // 任务已空停止运行
             if (this.taskList.isEmpty()) break
             // 没有剩余时间并且不存在超时任务则停止
-            if (timeRemaining() <= 0 &&
+            if (idleDeadline.timeRemaining() <= 0 &&
                 this.taskList.getFirstTimeOut() > performance.now()) {
                 break
             }
