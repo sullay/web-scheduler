@@ -3,10 +3,10 @@ import { MAX_LEVEL, HEAD, TAIL, PRIORITY_TYPE, DEFAULT_PRIORITY_TIMEOUT } from '
 import { Task } from './task'
 import { Node } from './node'
 import { isFunction, type AnyFunction } from '../utils/utils'
+
 /**
- * 任务列表
- * hash+双向跳表
- */
+* 基于hash+双向跳表的任务列表，定制场景下可用于自定义任务调度器
+*/
 export class TaskList {
     /** 使用map可以通过key值直接定位到目标任务 */
     private readonly map = new Map<TaskKeyType, Node>()
@@ -17,12 +17,11 @@ export class TaskList {
     /** 表尾 */
     private readonly tail = new Node(new Task(TAIL))
     /** 优先级对应超时时间 */
-    private readonly priorityTimeout: typeof DEFAULT_PRIORITY_TIMEOUT
+    private priorityTimeout = DEFAULT_PRIORITY_TIMEOUT
     /**
-   * @param options.priorityTimeout 自定义优先级超时时间
-   */
-    constructor (options: { priorityTimeout?: PriorityTimeoutParams } = {}) {
-        this.priorityTimeout = { ...DEFAULT_PRIORITY_TIMEOUT, ...options.priorityTimeout }
+    * @param options.priorityTimeout 自定义优先级超时时间
+    */
+    constructor () {
         // 构建空跳表
         for (let i = 0; i < MAX_LEVEL; i++) {
             this.head.setNext(i, this.tail)
@@ -31,8 +30,8 @@ export class TaskList {
     }
 
     /**
-   * 随机生成层级
-   */
+    * 随机生成层级
+    */
     static generateLevel () {
         let level = 1
         for (let i = 1; i < MAX_LEVEL; i++) {
@@ -42,38 +41,46 @@ export class TaskList {
     }
 
     /**
-   * 判断某个级别是否为空
-   */
+    * 重新设置优先级对应超时时间
+    * @param priorityTimeoutParams 优先级对应超时时间
+    */
+    setPriorityTimeout (priorityTimeoutParams: PriorityTimeoutParams) {
+        this.priorityTimeout = { ...this.priorityTimeout, ...priorityTimeoutParams }
+    }
+
+    /**
+    * 判断某个级别是否为空
+    */
     isLevelEmpty (level: number) {
         return this.head.getNext(level) === this.tail
     }
 
     /**
-   * 判断跳表是否为空 (跳表最底层首尾相连说明跳表为空)
-   */
+    * 判断跳表是否为空 (跳表最底层首尾相连说明跳表为空)
+    */
     isEmpty () {
         return this.isLevelEmpty(0)
     }
 
     /**
-   * 通过任务key获取任务
-   * @param key 任务key值
-   */
+    * 通过任务key获取任务
+    * @param key 任务key值
+    */
     get (key: TaskKeyType) {
         return this.map.get(key)
     }
 
     /**
-   * 判断是否存在任务
-   * @param key 任务key值
-   */
+    * 判断是否存在任务
+    * @param key 任务key值
+    */
     has (key: TaskKeyType) {
         return this.map.has(key)
     }
 
     /**
-   * 获取最紧急任务的超时时间
-   */
+    * 获取最紧急任务的超时时间
+    */
     getFirstTimeOut () {
         if (this.isEmpty()) return DEFAULT_PRIORITY_TIMEOUT[PRIORITY_TYPE.IDLE]
         const firstTask = this.head.getNext(0)?.getTask()
@@ -82,10 +89,10 @@ export class TaskList {
     }
 
     /**
-   * 取出首个任务
-   */
+    * 取出首个任务
+    */
     shift () {
-    // 任务为空
+        // 任务为空
         if (this.isEmpty()) return null
         // 跳表中当前节点（初始为非head的首个节点）
         const currentNode = this.head.getNext(0)
@@ -109,14 +116,13 @@ export class TaskList {
         return currentTask
     }
 
-    // 添加任务，如果已经存在相同key的任务，更新任务方法，回调函数合并到callbackList，并根据超时时间移动位置。
     /**
-   *
-   * @param val 任务方法
-   * @param options.key 任务key值
-   * @param options.priority 任务优先级
-   * @param options.callback 任务回调函数
-   */
+    * 添加任务，如果已经存在相同key的任务，更新任务方法，回调函数合并到callbackList，并根据超时时间移动位置
+    * @param val 任务方法
+    * @param options.key 任务key值
+    * @param options.priority 任务优先级
+    * @param options.callback 任务回调函数
+    */
     put (val: AnyFunction, { key = Symbol('default'), priority = PRIORITY_TYPE.NORMAL, callback }: {
         key?: TaskKeyType
         priority?: PRIORITY_TYPE
