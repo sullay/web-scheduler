@@ -45,7 +45,7 @@ class AnimationFrameScheduler {
             this.isWorking = false
         } else {
             // 如果队列中存在任务，下一帧raf阶段执行
-            requestAnimationFrame(this.workLoop)
+            requestAnimationFrame(this.workLoop.bind(this))
         }
     }
 
@@ -62,7 +62,7 @@ class AnimationFrameScheduler {
         // 如果任务调度未启动，启动调度，并在下一帧raf阶段执行。
         if (!this.isWorking) {
             this.isWorking = true
-            requestAnimationFrame(this.workLoop)
+            requestAnimationFrame(this.workLoop.bind(this))
         }
     }
 }
