@@ -1,37 +1,33 @@
 import { TaskList } from '../lib/taskList'
-import type { AnimationFrameConfig } from '../utils/scheduler'
+import type { IdleFrameConfig } from '../utils/scheduler'
 import type { TaskKeyType, PRIORITY_TYPE } from '../utils/task'
 import type { AnyFunction } from '../utils/utils'
 
 /**
- * 基于requestAnimationFrame的任务调度器，dom操作首选
+ * 基于requestIdleCallback的任务调度器, 利用每一帧的空闲时间执行任务，最大程度利用计算资源，推荐非关键任务使用
  */
-class AnimationFrameScheduler {
+class IdleFrameScheduler {
     private readonly taskList = new TaskList()
     private isWorking = false
-    /** 谨慎设置，自定义需要参考运行设备的fps */
-    private frameDuration = 5
 
     /**
      *  修改默认配置
-     * @param priorityTimeoutParams 自定义超时时间
-     * @param frameDuration 自定义每帧占用时长（ms）
+     * @param options.priorityTimeoutParams 自定义超时时间
      */
-    setConfig ({ priorityTimeoutParams = {}, frameDuration = 5 }: AnimationFrameConfig) {
+    setConfig ({ priorityTimeoutParams = {} }: IdleFrameConfig) {
         this.taskList.setPriorityTimeout(priorityTimeoutParams)
-        this.frameDuration = frameDuration
     }
 
     /**
      * 执行任务循环
-     * @param timestamp 进入任务调度时的时间戳
+     * @param timeRemaining 用于计算空闲时间的函数
      */
-    private workLoop (timestamp: number) {
+    private workLoop ({ timeRemaining }: IdleDeadline) {
         while (true) {
             // 任务已空停止运行
             if (this.taskList.isEmpty()) break
-            // requestAnimationFrame占用时长超过{frameDuration}，并且没有没有超时任务则停止运行
-            if (performance.now() - timestamp > this.frameDuration &&
+            // 没有剩余时间并且不存在超时任务则停止
+            if (timeRemaining() <= 0 &&
                 this.taskList.getFirstTimeOut() > performance.now()) {
                 break
             }
@@ -45,7 +41,7 @@ class AnimationFrameScheduler {
             this.isWorking = false
         } else {
             // 如果队列中存在任务，下一帧raf阶段执行
-            requestAnimationFrame(this.workLoop.bind(this))
+            requestIdleCallback(this.workLoop.bind(this))
         }
     }
 
@@ -62,12 +58,12 @@ class AnimationFrameScheduler {
         // 如果任务调度未启动，启动调度，并在下一帧raf阶段执行。
         if (!this.isWorking) {
             this.isWorking = true
-            requestAnimationFrame(this.workLoop.bind(this))
+            requestIdleCallback(this.workLoop.bind(this))
         }
     }
 }
 
 /**
- * 基于requestAnimationFrame的任务调度器，dom操作首选
+ * 基于requestIdleCallback的任务调度器, 利用每一帧的空闲时间执行任务，最大程度利用计算资源，推荐非关键任务使用
  */
-export const animationFrameScheduler = new AnimationFrameScheduler()
+export const idleFrameScheduler = new IdleFrameScheduler()

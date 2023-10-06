@@ -11,7 +11,7 @@ export const TAIL = Symbol('TAIL')
 export enum PRIORITY_TYPE { IMMEDIATE = 'immediate', IDLE = 'idle', HIGH = 'high', NORMAL = 'normal', LOW = 'low' }
 
 /**
- * 默认各优先级超时使劲啊
+ * 默认各优先级超时时间
  */
 export const DEFAULT_PRIORITY_TIMEOUT = {
     [PRIORITY_TYPE.IMMEDIATE]: -1 as const,

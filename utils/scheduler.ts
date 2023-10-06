@@ -1,6 +1,11 @@
 import { type PriorityTimeoutParams } from './task'
 
-export interface Config {
+export interface BaseConfig {
     priorityTimeoutParams?: PriorityTimeoutParams
+}
+
+export interface IdleFrameConfig extends BaseConfig {}
+
+export interface AnimationFrameConfig extends BaseConfig {
     frameDuration?: number
 }
