@@ -1,12 +1,12 @@
 import { TaskList } from '../lib/taskList'
-import { calculateAverageFrameDuration, type AnimationFrameConfig } from '../utils/scheduler'
+import { calculateAverageFrameDuration, type ImmediateConfig } from '../utils/scheduler'
 import type { TaskKeyType, PRIORITY_TYPE } from '../utils/task'
-import type { AnyFunction } from '../utils/utils'
+import { setImmediatePolyfill, type AnyFunction } from '../utils/utils'
 
 /**
- * 基于requestAnimationFrame的任务调度器，dom操作首选
+ * 基于setImmediate的任务调度器, 适合用来执行非dom操作的重要任务（无法测算Timers阶段的其他任务时长，不推荐操作dom）
  */
-class AnimationFrameScheduler {
+class ImmediateScheduler {
     private readonly taskList = new TaskList()
     private isWorking = false
     /** 谨慎设置，自定义需要参考运行设备的fps(默认值为设备刷新率时长的一半) */
@@ -17,7 +17,7 @@ class AnimationFrameScheduler {
      * @param priorityTimeoutParams 自定义超时时间
      * @param frameDuration 自定义每帧占用时长（ms）
      */
-    async setConfig ({ priorityTimeoutParams = {}, frameDuration }: AnimationFrameConfig) {
+    async setConfig ({ priorityTimeoutParams = {}, frameDuration }: ImmediateConfig) {
         this.taskList.setPriorityTimeout(priorityTimeoutParams)
         if (typeof frameDuration === 'number' && frameDuration > 0) this.frameDuration = frameDuration
     }
@@ -30,7 +30,7 @@ class AnimationFrameScheduler {
         while (true) {
             // 任务已空停止运行
             if (this.taskList.isEmpty()) break
-            // requestAnimationFrame占用时长超过{frameDuration}，并且没有没有超时任务则停止运行
+            // setImmediate占用时长超过{frameDuration}，并且没有没有超时任务则停止运行
             if (performance.now() - timestamp > this.frameDuration &&
                 this.taskList.getFirstTimeOut() > performance.now()) {
                 break
@@ -45,7 +45,7 @@ class AnimationFrameScheduler {
             this.isWorking = false
         } else {
             // 如果队列中存在任务，下一帧raf阶段执行
-            requestAnimationFrame(this.workLoop.bind(this))
+            setImmediatePolyfill(this.workLoop.bind(this, performance.now()))
         }
     }
 
@@ -62,16 +62,16 @@ class AnimationFrameScheduler {
         // 如果任务调度未启动，启动调度，并在下一帧raf阶段执行。
         if (!this.isWorking) {
             this.isWorking = true
-            requestAnimationFrame(this.workLoop.bind(this))
+            setImmediatePolyfill(this.workLoop.bind(this, performance.now()))
         }
     }
 }
 
 /**
- * 基于requestAnimationFrame的任务调度器，dom操作首选
+ * 基于setImmediate的任务调度器, 适合用来执行非dom操作的重要任务（无法测算Timers阶段的其他任务时长，不推荐操作dom）
  */
-export const animationFrameScheduler = new AnimationFrameScheduler()
+export const immediateScheduler = new ImmediateScheduler()
 
 calculateAverageFrameDuration().then(frameDuration => {
-    animationFrameScheduler.setConfig({ frameDuration: Math.ceil(frameDuration / 2) })
+    immediateScheduler.setConfig({ frameDuration: Math.ceil(frameDuration / 2) })
 })

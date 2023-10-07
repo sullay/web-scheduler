@@ -14,7 +14,7 @@ class IdleFrameScheduler {
      *  修改默认配置
      * @param options.priorityTimeoutParams 自定义超时时间
      */
-    setConfig ({ priorityTimeoutParams = {} }: IdleFrameConfig) {
+    async setConfig ({ priorityTimeoutParams = {} }: IdleFrameConfig) {
         this.taskList.setPriorityTimeout(priorityTimeoutParams)
     }
 
