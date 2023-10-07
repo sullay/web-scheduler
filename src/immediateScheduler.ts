@@ -73,5 +73,5 @@ class ImmediateScheduler {
 export const immediateScheduler = new ImmediateScheduler()
 
 calculateAverageFrameDuration().then(frameDuration => {
-    immediateScheduler.setConfig({ frameDuration: Math.ceil(frameDuration / 2) })
+    immediateScheduler.setConfig({ frameDuration: Math.floor(frameDuration / 2) })
 })

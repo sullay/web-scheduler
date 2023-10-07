@@ -1,45 +1,35 @@
 import { TaskList } from '../lib/taskList'
-import { calculateAverageFrameDuration, type AnimationFrameConfig } from '../utils/scheduler'
+import { type singleAnimationFrameConfig } from '../utils/scheduler'
 import type { TaskKeyType, PRIORITY_TYPE } from '../utils/task'
 import type { AnyFunction } from '../utils/utils'
 
 /**
- * 基于requestAnimationFrame的任务调度器，dom操作首选
+ * 基于requestAnimationFrame的任务调度器，每一个动画帧只执行一个任务，用于逐帧操作动画
  */
-class AnimationFrameScheduler {
+class SingleAnimationFrameScheduler {
     private readonly taskList = new TaskList()
     private isWorking = false
-    /** 谨慎设置，自定义需要参考运行设备的fps(默认值为设备刷新率时长的一半) */
-    private frameDuration = 5
 
     /**
      *  修改默认配置
      * @param priorityTimeoutParams 自定义超时时间
-     * @param frameDuration 自定义每帧占用时长（ms）
      */
-    async setConfig ({ priorityTimeoutParams = {}, frameDuration }: AnimationFrameConfig) {
+    async setConfig ({ priorityTimeoutParams = {} }: singleAnimationFrameConfig) {
         this.taskList.setPriorityTimeout(priorityTimeoutParams)
-        if (typeof frameDuration === 'number' && frameDuration > 0) this.frameDuration = frameDuration
     }
 
     /**
      * 执行任务循环
      * @param timestamp 进入任务调度时的时间戳
      */
-    private workLoop (timestamp: number) {
-        while (true) {
-            // 任务已空停止运行
-            if (this.taskList.isEmpty()) break
-            // requestAnimationFrame占用时长超过{frameDuration}，并且没有没有超时任务则停止运行
-            if (performance.now() - timestamp > this.frameDuration &&
-                this.taskList.getFirstTimeOut() > performance.now()) {
-                break
-            }
-
+    private workLoop () {
+        // 任务已空停止运行
+        if (!this.taskList.isEmpty()) {
             const task = this.taskList.shift()
             // 执行任务以及回调函数
             task?.run()
         }
+
         if (this.taskList.isEmpty()) {
             // 不存在任务，停止调度
             this.isWorking = false
@@ -68,10 +58,6 @@ class AnimationFrameScheduler {
 }
 
 /**
- * 基于requestAnimationFrame的任务调度器，dom操作首选
+ * 基于requestAnimationFrame的任务调度器，每一个动画帧只执行一个任务，用于逐帧操作动画
  */
-export const animationFrameScheduler = new AnimationFrameScheduler()
-
-calculateAverageFrameDuration().then(frameDuration => {
-    animationFrameScheduler.setConfig({ frameDuration: Math.floor(frameDuration / 2) })
-})
+export const singleAnimationFrameScheduler = new SingleAnimationFrameScheduler()

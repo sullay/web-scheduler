@@ -1,0 +1,13 @@
+{
+  "name": "examples",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "vite": "^2.7.2"
+  },
+  "dependencies": {
+    "web-scheduler": "^1.3.1"
+  }
+}

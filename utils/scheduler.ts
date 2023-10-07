@@ -6,10 +6,15 @@ export interface BaseConfig {
 
 export interface IdleFrameConfig extends BaseConfig {}
 
+export interface singleAnimationFrameConfig extends BaseConfig {}
+
 export interface AnimationFrameConfig extends BaseConfig {
     frameDuration?: number
 }
-export interface ImmediateConfig extends AnimationFrameConfig {}
+
+export interface ImmediateConfig extends BaseConfig {
+    frameDuration?: number
+}
 
 /**
  * 计算设备刷新率，每一帧所用时间
