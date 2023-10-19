@@ -101,7 +101,7 @@ taskList.setPriorityTimeout({
 
 ### AnimationFrameScheduler
 
-`AnimationFrameScheduler` 是一个基于 `requestAnimationFrame` 的任务调度器，适用于需要进行 DOM 操作的场景。
+`AnimationFrameScheduler` 是一个基于 `requestAnimationFrame` 的任务调度器，适用于动画、布局计算。
 
 - 执行阶段：rAF
 - 时间分片时长：默认通过估算屏幕刷新率计算。例如fps为60hz，Math.floor(1000/{fps}/2) = 4ms
@@ -164,7 +164,7 @@ circle.onclick = ()=>{
 
 ### ImmediateScheduler
 
-`ImmediateScheduler` 是一个基于 `setImmediate` 的任务调度器，用于执行非 DOM 操作的重要任务。它适合用于处理需要尽快执行的任务，如数据处理、网络请求等，但不推荐用于操作 DOM。
+`ImmediateScheduler` 是一个基于 `setImmediate` 的任务调度器，适合用于操作 DOM 元素以及执行其他 JavaScript 功能。
 
 - 执行阶段：JS
 - 时间分片时长：默认通过估算屏幕刷新率计算。例如fps为60hz，Math.floor(1000/{fps}/2) = 4ms

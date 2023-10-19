@@ -4,7 +4,7 @@ import type { TaskKeyType, PRIORITY_TYPE } from '../utils/task'
 import type { AnyFunction } from '../utils/utils'
 
 /**
- * 基于requestAnimationFrame的任务调度器，dom操作首选
+ * 基于requestAnimationFrame的任务调度器，适用于动画、布局计算
  */
 class AnimationFrameScheduler {
     private readonly taskList = new TaskList()
@@ -68,7 +68,7 @@ class AnimationFrameScheduler {
 }
 
 /**
- * 基于requestAnimationFrame的任务调度器，dom操作首选
+ * 基于requestAnimationFrame的任务调度器，适用于动画、布局计算
  */
 export const animationFrameScheduler = new AnimationFrameScheduler()
 

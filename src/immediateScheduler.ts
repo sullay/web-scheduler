@@ -4,7 +4,7 @@ import type { TaskKeyType, PRIORITY_TYPE } from '../utils/task'
 import { setImmediatePolyfill, type AnyFunction } from '../utils/utils'
 
 /**
- * 基于setImmediate的任务调度器, 适合用来执行非dom操作的重要任务
+ * 基于setImmediate的任务调度器, 适合用于操作 DOM 元素以及执行其他 JavaScript 功能
  */
 class ImmediateScheduler {
     private readonly taskList = new TaskList()
@@ -68,7 +68,7 @@ class ImmediateScheduler {
 }
 
 /**
- * 基于setImmediate的任务调度器, 适合用来执行非dom操作的重要任务
+ * 基于setImmediate的任务调度器, 适合用于操作 DOM 元素以及执行其他 JavaScript 功能
  */
 export const immediateScheduler = new ImmediateScheduler()
 
