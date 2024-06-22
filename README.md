@@ -215,3 +215,4 @@ function report() {
 idleFrameScheduler.pushTask(log);
 idleFrameScheduler.pushTask(report);
 ```
+
